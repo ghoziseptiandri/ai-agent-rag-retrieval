@@ -12,7 +12,7 @@ def log(event: str, data: dict | None = None) -> None:
         "data": data or {},
     }
 
-    print(record)
+    #print(record)
 
     with open(LOG_FILE, "a") as file:
         file.write(json.dumps(record) + "\n")

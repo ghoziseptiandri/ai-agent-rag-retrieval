@@ -105,10 +105,54 @@ delete_memory_tool = types.Tool(
     ]
 )
 
+file_reader_tool = types.Tool(
+    function_declarations=[
+        types.FunctionDeclaration(
+            name="read_file",
+            description=(
+                "Read the contents of a local text file."
+            ),
+            parameters=types.Schema(
+                type="OBJECT",
+                properties={
+                    "file_path": types.Schema(
+                        type="STRING",
+                        description=(
+                            "Path of the file to read."
+                        ),
+                    ),
+                },
+                required=["file_path"],
+            ),
+        )
+    ]
+)
+
+weather_tool = types.Tool(
+    function_declarations=[
+        types.FunctionDeclaration(
+            name="get_weather",
+            description="Get the current weather for a city.",
+            parameters=types.Schema(
+                type="OBJECT",
+                properties={
+                    "city": types.Schema(
+                        type="STRING",
+                        description="The city name, for example Jakarta or Tokyo."
+                    )
+                },
+                required=["city"],
+            ),
+        )
+    ]
+)
+
 GEMINI_TOOLS = [
     calculator_tool,
     time_tool,
     memory_tool,
     update_memory_tool,
-    delete_memory_tool
+    delete_memory_tool,
+    file_reader_tool,
+    weather_tool
 ]

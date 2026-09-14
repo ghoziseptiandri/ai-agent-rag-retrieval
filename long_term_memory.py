@@ -1,60 +1,62 @@
-import json
-from pathlib import Path
+from database import (
+    init_database,
+    load_memories as db_load_memories,
+    save_memory as db_save_memory,
+    update_memory as db_update_memory,
+    delete_memory as db_delete_memory,
+)
 
-MEMORY_FILE = Path("long_term_memory.json")
+
+init_database()
 
 
 def load_long_term_memory() -> dict:
-    if not MEMORY_FILE.exists():
-        return {}
-
-    if MEMORY_FILE.stat().st_size == 0:
-        return {}
-
-    with open(MEMORY_FILE, "r") as file:
-        return json.load(file)
+    return db_load_memories()
 
 
 def save_long_term_memory(memory: dict) -> None:
-    with open(MEMORY_FILE, "w") as file:
-        json.dump(memory, file, indent=2)
+    current_memory = db_load_memories()
+
+    # Delete memories that are no longer present.
+    for key in current_memory:
+        if key not in memory:
+            db_delete_memory(key)
+
+    # Insert new memories or update existing ones.
+    for key, value in memory.items():
+        if key in current_memory:
+            if current_memory[key] != value:
+                db_update_memory(key, value)
+        else:
+            db_save_memory(key, value)
 
 
 def save_memory(key: str, value: str) -> str:
-    memory = load_long_term_memory()
+    saved = db_save_memory(key, value)
 
-    if key in memory:
+    if not saved:
         return f"Memory key '{key}' already exists."
 
-    memory[key] = value
-    save_long_term_memory(memory)
-
-    #print(f"🧠 Memory saved: {key} = {value}")
     return f"Saved {key} = {value}"
 
 
 def update_memory(key: str, value: str) -> str:
-    memory = load_long_term_memory()
+    memory = db_load_memories()
 
     if key not in memory:
         return f"Memory key '{key}' does not exist."
 
     old_value = memory[key]
-    memory[key] = value
-    save_long_term_memory(memory)
 
-    #print(f"🧠 Memory updated: {key}: {old_value} → {value}")
+    db_update_memory(key, value)
+
     return f"Updated {key} from {old_value} to {value}"
 
 
 def delete_memory(key: str) -> str:
-    memory = load_long_term_memory()
+    deleted = db_delete_memory(key)
 
-    if key not in memory:
+    if not deleted:
         return f"Memory key '{key}' does not exist."
 
-    old_value = memory.pop(key)
-    save_long_term_memory(memory)
-
-    #print(f"🧠 Memory deleted: {key} = {old_value}")
     return f"Deleted memory {key}"

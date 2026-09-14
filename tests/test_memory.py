@@ -1,132 +1,111 @@
-import json
+import database
 
-import long_term_memory
+from long_term_memory import (
+    load_long_term_memory,
+    save_memory,
+    update_memory,
+    delete_memory,
+)
 
 
-def test_save_memory(tmp_path, monkeypatch):
-    test_file = tmp_path / "memory.json"
+def setup_function():
+    database.DB_PATH = "test_agent.db"
+    database.init_database()
 
-    monkeypatch.setattr(
-        long_term_memory,
-        "MEMORY_FILE",
-        test_file
-    )
 
-    result = long_term_memory.save_memory(
+def teardown_function():
+    import os
+
+    if os.path.exists("test_agent.db"):
+        os.remove("test_agent.db")
+
+
+def test_save_memory():
+    result = save_memory(
         "favorite_number",
-        "42"
+        "11",
     )
 
-    assert result == "Saved favorite_number = 42"
+    assert result == "Saved favorite_number = 11"
 
-    with open(test_file, "r") as file:
-        data = json.load(file)
+    memory = load_long_term_memory()
 
-    assert data["favorite_number"] == "42"
+    assert memory == {
+        "favorite_number": "11"
+    }
 
 
-def test_update_memory(tmp_path, monkeypatch):
-    test_file = tmp_path / "memory.json"
-
-    monkeypatch.setattr(
-        long_term_memory,
-        "MEMORY_FILE",
-        test_file
-    )
-
-    long_term_memory.save_memory(
+def test_update_memory():
+    save_memory(
         "favorite_number",
-        "42"
+        "11",
     )
 
-    result = long_term_memory.update_memory(
+    result = update_memory(
         "favorite_number",
-        "7"
+        "13",
     )
 
-    assert "Updated favorite_number" in result
+    assert result == "Updated favorite_number from 11 to 13"
 
-    with open(test_file, "r") as file:
-        data = json.load(file)
+    memory = load_long_term_memory()
 
-    assert data["favorite_number"] == "7"
+    assert memory == {
+        "favorite_number": "13"
+    }
 
 
-def test_delete_memory(tmp_path, monkeypatch):
-    test_file = tmp_path / "memory.json"
-
-    monkeypatch.setattr(
-        long_term_memory,
-        "MEMORY_FILE",
-        test_file
-    )
-
-    long_term_memory.save_memory(
+def test_delete_memory():
+    save_memory(
         "favorite_number",
-        "42"
+        "11",
     )
 
-    result = long_term_memory.delete_memory(
+    result = delete_memory(
         "favorite_number"
     )
 
     assert result == "Deleted memory favorite_number"
 
-    with open(test_file, "r") as file:
-        data = json.load(file)
+    assert load_long_term_memory() == {}
 
-    assert "favorite_number" not in data
 
-def test_save_duplicate_memory(tmp_path, monkeypatch):
-    test_file = tmp_path / "memory.json"
-
-    monkeypatch.setattr(
-        long_term_memory,
-        "MEMORY_FILE",
-        test_file
-    )
-
-    long_term_memory.save_memory(
+def test_save_duplicate_memory():
+    save_memory(
         "favorite_number",
-        "42"
+        "11",
     )
 
-    result = long_term_memory.save_memory(
+    result = save_memory(
         "favorite_number",
-        "42"
+        "13",
     )
 
-    assert result == "Memory key 'favorite_number' already exists."
-
-
-def test_update_missing_memory(tmp_path, monkeypatch):
-    test_file = tmp_path / "memory.json"
-
-    monkeypatch.setattr(
-        long_term_memory,
-        "MEMORY_FILE",
-        test_file
+    assert result == (
+        "Memory key 'favorite_number' already exists."
     )
 
-    result = long_term_memory.update_memory(
+    assert load_long_term_memory() == {
+        "favorite_number": "11"
+    }
+
+
+def test_update_missing_memory():
+    result = update_memory(
         "favorite_number",
-        "7"
+        "13",
     )
 
-    assert result == "Memory key 'favorite_number' does not exist."
-
-
-def test_delete_missing_memory(tmp_path, monkeypatch):
-    test_file = tmp_path / "memory.json"
-
-    monkeypatch.setattr(
-        long_term_memory,
-        "MEMORY_FILE",
-        test_file
+    assert result == (
+        "Memory key 'favorite_number' does not exist."
     )
 
-    result = long_term_memory.delete_memory(
+
+def test_delete_missing_memory():
+    result = delete_memory(
         "favorite_number"
     )
 
-    assert result == "Memory key 'favorite_number' does not exist."
+    assert result == (
+        "Memory key 'favorite_number' does not exist."
+    )

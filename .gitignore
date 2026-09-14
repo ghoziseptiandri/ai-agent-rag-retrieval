@@ -18,6 +18,12 @@ agent.jsonl
 # Local agent memory / runtime data
 memory.json
 long_term_memory.json
+long_term_memory.json.backup
+
+# SQLite databases / runtime data
+agent.db
+test_agent.db
+*.db-journal
 
 # macOS system files
 .DS_Store

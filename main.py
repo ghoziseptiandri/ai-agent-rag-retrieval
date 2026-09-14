@@ -66,6 +66,8 @@ def main():
             "agent": answer
         })
 
+        print(f"\nAgent: {answer}")
+
         # Keep persistent memory limited too
         memory = memory[-MAX_MEMORY_ITEMS:]
 
