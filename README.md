@@ -41,7 +41,7 @@
 
 ---
 
-## 🔵 Phase 2 — Tools, Safety & Database Memory
+## 🔵 Phase 2 - Tools, Safety & Database Memory
 
 ### Real-World Tools
 
@@ -61,7 +61,7 @@
 
 ---
 
-## 🟣 Phase 3 — RAG, Production & Deployment
+## 🟣 Phase 3 - RAG, Production & Deployment
 
 ### Knowledge & Retrieval
 
