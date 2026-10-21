@@ -147,6 +147,25 @@ weather_tool = types.Tool(
     ]
 )
 
+search_knowledge_base_tool = types.Tool(
+    function_declarations=[
+        types.FunctionDeclaration(
+            name="search_knowledge_base",
+            description="Search the knowledge base for information from indexed documents.",
+            parameters=types.Schema(
+                type="OBJECT",
+                properties={
+                    "question": types.Schema(
+                        type="STRING",
+                        description="The question to search for in the knowledge base.",
+                    ),
+                },
+                required=["question"],
+            ),
+        )
+    ]
+)
+
 GEMINI_TOOLS = [
     calculator_tool,
     time_tool,
@@ -154,5 +173,6 @@ GEMINI_TOOLS = [
     update_memory_tool,
     delete_memory_tool,
     file_reader_tool,
-    weather_tool
+    weather_tool,
+    search_knowledge_base_tool,
 ]

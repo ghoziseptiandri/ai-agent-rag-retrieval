@@ -27,3 +27,6 @@ test_agent.db
 
 # macOS system files
 .DS_Store
+
+# RAG vector store
+data/vectors.json
